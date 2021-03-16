@@ -64,3 +64,25 @@ def test_group_shift_lose_timezone():
     result = df.groupby("a").shift(0).iloc[0]
     expected = Series({"date": now_dt}, name=result.name)
     tm.assert_series_equal(result, expected)
+
+
+def test_group_shift_lose_index_1():
+    # GH 13519 -- test with as_index=False
+    df = DataFrame({'K': [1, 1, 1, 2, 2, 3], 'V': [1, 2, 3, 4, 5, 6]})
+    g = df.groupby('K', as_index=False)
+
+    expected = DataFrame({'K': [1, 1, 1, 2, 2, 3], 'V': [np.nan, 1, 2, np.nan, 4, np.nan]})
+    result = g.shift(1)
+
+    tm.assert_frame_equal(expected, result)
+
+
+def test_group_shift_lose_index_2():
+    # GH 13519 -- test with as_index=True
+    df = DataFrame({'K': [1, 1, 1, 2, 2, 3], 'V': [1, 2, 3, 4, 5, 6]})
+    g = df.groupby('K', as_index=True)
+
+    expected = DataFrame({'K': [1, 1, 1, 2, 2, 3], 'V': [np.nan, 1, 2, np.nan, 4, np.nan]}).set_index('K')
+    result = g.shift(1)
+
+    tm.assert_frame_equal(expected, result)
