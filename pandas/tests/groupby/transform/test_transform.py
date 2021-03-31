@@ -27,6 +27,18 @@ def assert_fp_equal(a, b):
     assert (np.abs(a - b) < 1e-12).all()
 
 
+def test_transform_simple_no_index():
+    # GH 13519
+    df = DataFrame({'K': [1, 1, 2, 2], 'V': [1, 2, 3, 4]})
+    grouped = df.groupby('K', as_index=False)
+
+    expected = DataFrame({'K': [1, 1, 2, 2], 'V': [0, 1, 2, 3]})
+    breakpoint()
+    actual = grouped.transform(lambda x: x - 1)
+
+    tm.assert_frame_equal(expected, actual)
+
+
 def test_transform():
     data = Series(np.arange(9) // 3, index=np.arange(9))
 
